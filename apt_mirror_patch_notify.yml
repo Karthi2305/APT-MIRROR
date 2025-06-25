@@ -32,28 +32,32 @@
       register: apt_result
 
     - name: Send notification email
-      mail:
-        host: mail.aravind.org
-        port: 25
-        to: "aravind_slcs_intern2@aravind.org"
-        from: "noreply@aravind.org"
-        subject: "📦 Mirror Patch Success on {{ inventory_hostname }}"
-        body: |
-          Hello Team,
+  community.general.mail:
+    host: smtp.gmail.com
+    port: 587
+    username: "aravind_slcs_intern2@aravind.org"
+    password: "hjcqlojjlcatjwqq"  # App password (no spaces)
+    to: "aravind_slcs_intern2@aravind.org"
+    from: "aravind_slcs_intern2@aravind.org"
+    subject: "📦 Mirror Patch Success on {{ inventory_hostname }}"
+    body: |
+      Hello Team,
 
-          ✅ The system **{{ inventory_hostname }}** has been successfully patched using the local APT mirror.
+      ✅ The system **{{ inventory_hostname }}** has been successfully patched using the local APT mirror.
 
-          🖥️ Hostname         : {{ inventory_hostname }}
-          🧠 Operating System : {{ ansible_distribution }} {{ ansible_distribution_version }}
-          🌐 Mirror URL       : {{ mirror_url }}
-          📦 Release          : {{ release }}
-          📅 Timestamp        : {{ ansible_date_time.iso8601 }}
+      🖥️ Hostname         : {{ inventory_hostname }}
+      🧠 Operating System : {{ ansible_distribution }} {{ ansible_distribution_version }}
+      🌐 Mirror URL       : {{ mirror_url }}
+      📦 Release          : {{ release }}
+      📅 Timestamp        : {{ ansible_date_time.iso8601 }}
 
-          📌 The following APT source list was configured:
-          {{ (sources_content_kali if is_kali else sources_content_mint) | indent(2) }}
+      📌 The following APT source list was configured:
+      {{ (sources_content_kali if is_kali else sources_content_mint) | indent(2) }}
 
-          📁 The system now fetches packages from the trusted internal repository.
+      📁 The system now fetches packages from the trusted internal repository.
 
-          Regards,  
-          🔧 Ansible Automation System
-      when: apt_result is succeeded
+      Regards,  
+      🔧 Ansible Automation System
+    secure: starttls
+  delegate_to: localhost
+  when: apt_result is succeeded
