@@ -1,5 +1,5 @@
 ---
-- name: Configure APT Mirror and Send Notification
+name: Configure APT Mirror and Send Notification
   hosts: all
   become: yes
   vars:
@@ -16,43 +16,51 @@
       deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }}-security main restricted universe multiverse
 
   tasks:
-    - name: Update sources.list with local mirror
-      copy:
-        dest: /etc/apt/sources.list
-        content: "{{ sources_content_kali if is_kali else sources_content_mint }}"
-      register: sources_result
+    - name: Patch and Notify Block
+      block:
+        - name: Update sources.list with local mirror
+          copy:
+            dest: /etc/apt/sources.list
+            content: "{{ sources_content_kali if is_kali else sources_content_mint }}"
+          register: sources_result
 
-    - name: Update APT package cache
-      apt:
-        update_cache: yes
-      register: apt_result
+        - name: Update APT package cache
+          apt:
+            update_cache: yes
+          register: apt_result
 
-    - name: Send notification email
-      community.general.mail:
-        host: smtp.gmail.com
-        port: 587
-        username: "aravind_slcs_intern2@aravind.org"
-        password: "{{ email_password }}"
-        to: "aravind_slcs_intern2@aravind.org"
-        from: "aravind_slcs_intern2@aravind.org"
-        subject: "📦 Mirror Patch Report - {{ inventory_hostname }}"
-        body: |
-          Hello Team,
+      rescue:
+        - name: Set patch_status to failed
+          set_fact:
+            patch_status: "❌ FAILED"
+        - name: Set fallback results
+          set_fact:
+            sources_result: { changed: false }
+            apt_result: { changed: false }
 
-          The system **{{ inventory_hostname }}** has completed the mirror patch operation.
+      always:
+        - name: Send notification email
+          delegate_to: localhost
+          community.general.mail:
+            port: 587
+            username: "aravind_slcs_intern2@aravind.org"
+            password: "{{ email_password }}"
+            to: "aravind_slcs_intern2@aravind.org"
+            from: "aravind_slcs_intern2@aravind.org"
+            subject: "{{ patch_status | default('✅ SUCCESS') }} Mirror Patch Report - {{ inventory_hostname }}"
+            body: |
+              Hello Team,
 
-          🖥️ Hostname         : {{ inventory_hostname }}
-          🧠 OS               : {{ ansible_distribution }} {{ ansible_distribution_version }}
-          🌐 Mirror URL       : {{ mirror_url }}
-          📦 Release          : {{ release }}
-          📅 Timestamp        : {{ ansible_date_time.iso8601 }}
+              The system **{{ inventory_hostname }}** has completed the mirror patch operation.
 
-          📁 Source list file : {{ '✅ Updated' if sources_result.changed else '✅ Already Configured' }}
-          🔄 APT Cache Status : {{ '✅ Refreshed' if apt_result.changed else '🔄 No Updates Needed' }}
+              🖥️ Hostname         : {{ inventory_hostname }}
+              🧠 OS               : {{ ansible_distribution }} {{ ansible_distribution_version }}
+              🌐 Mirror URL       : {{ mirror_url }}
+              📦 Release          : {{ release }}
+              📅 Timestamp        : {{ ansible_date_time.iso8601 }}
 
-          📌 Source list content:
-          {{ (sources_content_kali if is_kali else sources_content_mint) | indent(2) }}
+              📁 Source list file : {{ '✅ Updated' if sources_result.changed else '✅ Already Configured' }}
+              🔄 APT Cache Status : {{ '✅ Refreshed' if apt_result.changed else '🔄 No Updates Needed' }}
 
-          Regards,  
-          🔧 Ansible Automation System
-      delegate_to: localhost
+              Regards,  
+              🔧 Ansible Automation System
