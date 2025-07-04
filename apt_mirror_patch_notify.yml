@@ -29,17 +29,17 @@
 
     - name: Send notification email
       community.general.mail:
-       host: smtp.gmail.com
+        host: smtp.gmail.com
         port: 587
         username: "aravind_slcs_intern2@aravind.org"
-        password: "hjcqlojjlcatjwqq"
+        password: "{{ email_password }}"
         to: "aravind_slcs_intern2@aravind.org"
         from: "aravind_slcs_intern2@aravind.org"
         subject: "📦 Mirror Patch Report - {{ inventory_hostname }}"
         body: |
           Hello Team,
 
-         The system **{{ inventory_hostname }}** has completed the mirror patch operation.
+          The system **{{ inventory_hostname }}** has completed the mirror patch operation.
 
           🖥️ Hostname         : {{ inventory_hostname }}
           🧠 OS               : {{ ansible_distribution }} {{ ansible_distribution_version }}
@@ -54,5 +54,5 @@
           {{ (sources_content_kali if is_kali else sources_content_mint) | indent(2) }}
 
           Regards,  
-         🔧 Ansible Automation System
+          🔧 Ansible Automation System
       delegate_to: localhost
