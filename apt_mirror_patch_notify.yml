@@ -44,7 +44,7 @@
           community.general.mail:
             port: 587
             username: "aravind_slcs_intern2@aravind.org"
-            password: "{{ email_password }}"
+            password: "ddpe cver gobw gkif"
             to: "aravind_slcs_intern2@aravind.org"
             from: "aravind_slcs_intern2@aravind.org"
             subject: "{{ patch_status | default('✅ SUCCESS') }} Mirror Patch Report - {{ inventory_hostname }}"
