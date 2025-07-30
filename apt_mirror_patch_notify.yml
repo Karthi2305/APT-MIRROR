@@ -1,4 +1,3 @@
----
 name: Configure APT Mirror and Send Notification
   hosts: all
   become: yes
@@ -7,13 +6,13 @@ name: Configure APT Mirror and Send Notification
     release: "noble"
     is_kali: "{{ ansible_distribution == 'Kali' }}"
     sources_content_kali: |
-      deb [arch=amd64 signed-by=/etc/apt/keyrings/ubuntu.gpg] {{ mirror_url }} {{ release }} main universe 
-      deb [arch=amd64 signed-by=/etc/apt/keyrings/ubuntu.gpg] {{ mirror_url }} {{ release }}-updates main universe 
-      deb [arch=amd64 signed-by=/etc/apt/keyrings/ubuntu.gpg] {{ mirror_url }} {{ release }}-security main universe 
+      deb [arch=amd64 signed-by=/etc/apt/keyrings/ubuntu.gpg] {{ mirror_url }} {{ release }} main restricted universe multiverse
+      deb [arch=amd64 signed-by=/etc/apt/keyrings/ubuntu.gpg] {{ mirror_url }} {{ release }}-updates main restricted universe multiverse
+      deb [arch=amd64 signed-by=/etc/apt/keyrings/ubuntu.gpg] {{ mirror_url }} {{ release }}-security main restricted universe multiverse
     sources_content_mint: |
-      deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }} main universe 
-      deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }}-updates main universe 
-      deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }}-security main universe 
+      deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }} main restricted universe multiverse
+      deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }}-updates main restricted universe multiverse
+      deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }}-security main restricted universe multiverse
 
   tasks:
     - name: Patch and Notify Block
@@ -41,10 +40,13 @@ name: Configure APT Mirror and Send Notification
       always:
         - name: Send notification email
           delegate_to: localhost
+          become: false
           community.general.mail:
+            host: smtp.gmail.com
             port: 587
-            username: "aravind_slcs_intern2@aravind.org"
-            password: "ddpe cver gobw gkif"
+            secure: starttls
+            username: "{{ lookup('env', 'EMAIL_USER') }}"
+            password: "{{ lookup('env', 'EMAIL_PASSWORD') }}"
             to: "aravind_slcs_intern2@aravind.org"
             from: "aravind_slcs_intern2@aravind.org"
             subject: "{{ patch_status | default('✅ SUCCESS') }} Mirror Patch Report - {{ inventory_hostname }}"
@@ -64,3 +66,4 @@ name: Configure APT Mirror and Send Notification
 
               Regards,  
               🔧 Ansible Automation System
+
