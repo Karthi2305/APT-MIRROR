@@ -1,4 +1,4 @@
-name: Configure APT Mirror and Send Notification
+- name: Configure APT Mirror and Send Notification
   hosts: all
   become: yes
   vars:
@@ -66,4 +66,3 @@ name: Configure APT Mirror and Send Notification
 
               Regards,  
               🔧 Ansible Automation System
-
