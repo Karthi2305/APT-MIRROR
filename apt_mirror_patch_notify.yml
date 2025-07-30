@@ -33,6 +33,7 @@
         - name: Set patch_status to failed
           set_fact:
             patch_status: "❌ FAILED"
+
         - name: Set fallback results
           set_fact:
             sources_result: { changed: false }
@@ -41,6 +42,7 @@
       always:
         - name: Send notification email
           delegate_to: localhost
+          become: false  # ✅ Prevent sudo on localhost
           community.general.mail:
             port: 587
             username: "aravind_slcs_intern2@aravind.org"
