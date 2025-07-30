@@ -1,5 +1,5 @@
 ---
-- name: Configure APT Mirror and Send Notification
+- name: Configure APT Mirror
   hosts: all
   become: yes
   vars:
@@ -16,7 +16,7 @@
       deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }}-security main universe 
 
   tasks:
-    - name: Patch and Notify Block
+    - name: Patch Block
       block:
         - name: Update sources.list with local mirror
           copy:
@@ -33,38 +33,7 @@
         - name: Set patch_status to failed
           set_fact:
             patch_status: "❌ FAILED"
-
         - name: Set fallback results
           set_fact:
             sources_result: { changed: false }
             apt_result: { changed: false }
-
-      always:
-        - name: Send notification email
-          delegate_to: localhost
-          become: false
-          community.general.mail:
-            host: smtp.gmail.com
-            port: 587
-            secure: starttls
-            username: "{{ lookup('env', 'EMAIL_USER') }}"
-            password: "{{ lookup('env', 'EMAIL_PASSWORD') }}"
-            to: "karthikeyan.sudhakar@aravind.org"
-            from: "karthikeyan.sudhakar@aravind.org"
-            subject: "{{ patch_status | default('✅ SUCCESS') }} Mirror Patch Report - {{ inventory_hostname }}"
-            body: |
-              Hello Team,
-
-              The system **{{ inventory_hostname }}** has completed the mirror patch operation.
-
-              🖥️ Hostname         : {{ inventory_hostname }}
-              🧠 OS               : {{ ansible_distribution }} {{ ansible_distribution_version }}
-              🌐 Mirror URL       : {{ mirror_url }}
-              📦 Release          : {{ release }}
-              📅 Timestamp        : {{ ansible_date_time.iso8601 }}
-
-              📁 Source list file : {{ '✅ Updated' if sources_result.changed else '✅ Already Configured' }}
-              🔄 APT Cache Status : {{ '✅ Refreshed' if apt_result.changed else '🔄 No Updates Needed' }}
-
-              Regards,  
-              🔧 Ansible Automation System
