@@ -1,0 +1,19 @@
+---
+- name: Push SSH public key to all client machines
+  hosts: all
+  become: yes
+  vars:
+    ssh_public_key_path: "/home/mduroot/.ssh/id_rsa.pub"  # Public key path on control node
+
+  tasks:
+    - name: Read public key from control node
+      ansible.builtin.slurp:
+        src: "{{ ssh_public_key_path }}"
+      delegate_to: localhost
+      register: pubkey_content
+
+    - name: Add public key to authorized_keys on remote
+      ansible.posix.authorized_key:
+        user: "{{ ansible_user }}"  # This will come from inventory or AWX credential
+        key: "{{ pubkey_content['content'] | b64decode }}"
+        state: present
