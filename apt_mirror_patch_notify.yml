@@ -15,6 +15,9 @@
       deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }}-updates main restricted universe multiverse
       deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }}-security main restricted universe multiverse
 
+    # Multiple recipients (comma separated)
+    email_recipients: "karthikeyan.sudhakar@aravind.org,aravind_slcs_intern2@aravind.org"
+
   tasks:
     - name: Patch and Notify Block
       block:
@@ -46,10 +49,10 @@
             host: smtp.gmail.com
             port: 587
             secure: starttls
-            username: "{{ lookup('env', 'EMAIL_USER') }}"
-            password: "{{ lookup('env', 'EMAIL_PASSWORD') }}"
-            to: "karthikeyan.sudhakar@aravind.org"
-            from: "karthikeyan.sudhakar@aravind.org"
+            username: "{{ smtp_username }}"   # Passed from AWX SMTP Email Credential
+            password: "{{ smtp_password }}"   # App Password or Token from AWX
+            to: "{{ email_recipients }}"
+            from: "{{ smtp_username }}"
             subject: "{{ patch_status | default('✅ SUCCESS') }} Mirror Patch Report - {{ inventory_hostname }}"
             body: |
               Hello Team,
