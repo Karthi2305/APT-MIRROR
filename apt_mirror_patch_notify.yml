@@ -20,7 +20,7 @@
       deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }}-security main  universe 
 
     # Multiple recipients (comma-separated)
-    notification_recipients: "aravind_slcs_intern2@aravind.org"
+    notification_recipients: "aravind_slcs_intern2@aravind.org,karthikeyan.sudhakar@aravind.org"
 
   tasks:
     - name: Patch and Notify Block
