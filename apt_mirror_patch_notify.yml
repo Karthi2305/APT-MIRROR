@@ -9,15 +9,15 @@
 
     # Sources for Kali
     sources_content_kali: |
-      deb [arch=amd64 signed-by=/etc/apt/keyrings/ubuntu.gpg] {{ mirror_url }} {{ release }} main restricted universe multiverse
-      deb [arch=amd64 signed-by=/etc/apt/keyrings/ubuntu.gpg] {{ mirror_url }} {{ release }}-updates main restricted universe multiverse
-      deb [arch=amd64 signed-by=/etc/apt/keyrings/ubuntu.gpg] {{ mirror_url }} {{ release }}-security main restricted universe multiverse
+      deb [arch=amd64 signed-by=/etc/apt/keyrings/ubuntu.gpg] {{ mirror_url }} {{ release }} main  universe 
+      deb [arch=amd64 signed-by=/etc/apt/keyrings/ubuntu.gpg] {{ mirror_url }} {{ release }}-updates main  universe 
+      deb [arch=amd64 signed-by=/etc/apt/keyrings/ubuntu.gpg] {{ mirror_url }} {{ release }}-security main  universe 
 
     # Sources for Mint/Ubuntu
     sources_content_mint: |
-      deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }} main restricted universe multiverse
-      deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }}-updates main restricted universe multiverse
-      deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }}-security main restricted universe multiverse
+      deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }} main  universe 
+      deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }}-updates main  universe 
+      deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }}-security main  universe 
 
     # Multiple recipients (comma-separated)
     notification_recipients: "aravind_slcs_intern2@aravind.org"
