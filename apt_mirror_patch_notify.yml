@@ -6,17 +6,21 @@
     mirror_url: "http://172.17.9.58/Ubuntu/mirror/archive.ubuntu.com/ubuntu"
     release: "noble"
     is_kali: "{{ ansible_distribution == 'Kali' }}"
+
+    # Sources for Kali
     sources_content_kali: |
       deb [arch=amd64 signed-by=/etc/apt/keyrings/ubuntu.gpg] {{ mirror_url }} {{ release }} main restricted universe multiverse
       deb [arch=amd64 signed-by=/etc/apt/keyrings/ubuntu.gpg] {{ mirror_url }} {{ release }}-updates main restricted universe multiverse
       deb [arch=amd64 signed-by=/etc/apt/keyrings/ubuntu.gpg] {{ mirror_url }} {{ release }}-security main restricted universe multiverse
+
+    # Sources for Mint/Ubuntu
     sources_content_mint: |
       deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }} main restricted universe multiverse
       deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }}-updates main restricted universe multiverse
       deb [arch=amd64 trusted=yes] {{ mirror_url }} {{ release }}-security main restricted universe multiverse
 
-    # Multiple recipients (comma separated)
-    email_recipients: "karthikeyan.sudhakar@aravind.org,aravind_slcs_intern2@aravind.org"
+    # Multiple recipients (comma-separated)
+    notification_recipients: "user1@example.com,user2@example.com,aravind_slcs_intern2@aravind.org"
 
   tasks:
     - name: Patch and Notify Block
@@ -49,10 +53,10 @@
             host: smtp.gmail.com
             port: 587
             secure: starttls
-            username: "{{ smtp_username }}"   # Passed from AWX SMTP Email Credential
-            password: "{{ smtp_password }}"   # App Password or Token from AWX
-            to: "{{ email_recipients }}"
-            from: "{{ smtp_username }}"
+            username: "{{ lookup('env', 'EMAIL_USER') }}"
+            password: "{{ lookup('env', 'EMAIL_PASSWORD') }}"
+            to: "{{ notification_recipients }}"
+            from: "{{ lookup('env', 'EMAIL_USER') }}"
             subject: "{{ patch_status | default('✅ SUCCESS') }} Mirror Patch Report - {{ inventory_hostname }}"
             body: |
               Hello Team,
